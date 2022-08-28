@@ -24,3 +24,5 @@ if a=="SI":
 # lista.insertlast('messi',19,2,3)
 lista.printlist()
 print("HOLAAAA")
+print("adiosss")
+
