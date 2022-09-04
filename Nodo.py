@@ -137,7 +137,7 @@ class DoublyLinkedList :
 				
 				#  Visit to down node
 				front = front.down	
-		print(end = "\n")
+		# print(end = "\n")
 		return resultado
 		
 
@@ -169,7 +169,7 @@ class DoublyLinkedList :
 					grid += str(cell)+"|"
 				grid = grid[:len(grid)-1]
 				grid+="}|"
-				print(end = "\n")
+				
 				#  Visit to down node
 				front = front.down	
 		grid = grid[:len(grid)-1]

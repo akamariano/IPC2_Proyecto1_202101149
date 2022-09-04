@@ -1,15 +1,12 @@
 
-from asyncio.windows_events import PipeServer
 from xml.dom import minidom
 from xml.etree.cElementTree import parse, Element
 from tkinter import N, filedialog as fd
 from listasimple import listasimple
 import xml.etree.ElementTree as ET
 import numpy as np
-import graphviz as gp
 from Nodo import DoublyLinkedList
 from Nodo import listadetableros
-import collections
 #######
 	
 	# def get_count(self):
@@ -23,6 +20,7 @@ import collections
 	# 		n = n.ref
 	# 		return count
 #######
+pacientes=[]
 print("-----Predicción Patrones Enfermedades-----")
 lista = listasimple()
 a= input("¿Desea abrir archivo? Ingrese SI/NO " )
@@ -201,61 +199,128 @@ print("PACIENTE:")
 # dll.display()
 # dll.get_count() 
 
-print("Ingrese el nombre del paciente: ")
-x = input()
-paciente1=lista.getpaciente(nombre=x)
-a3=lista.getmatrix(nombre=x)
-dll = DoublyLinkedList()
-rows = len(a3)
-cols = len(a3)
-dll.insertData(a3, rows, cols)
-dll.dibujargrafica(x,"Período Inicial")
-nodotablero = listadetableros()
-nodotablero.tablero=dll
-paciente1.settableros(nodotablero)
-nodotab2=paciente1.tableros
-for i in range(int(paciente1.periodos)):
-	dll2=DoublyLinkedList()
-	dll2.insertData(nodotab2.tablero.siguientediag(), rows, cols)
-	tablero2=listadetableros()
-	tablero2.tablero=dll2
-	dll2.dibujargrafica(x,str(i+1))
-	nodotab2.siguiente=tablero2
+global nopa
+print("Ingrese el número de pacientes que desea investigar: ")
+nopa = input()
+nopa=int(nopa)
+pac=0
+for i in range(int(nopa)):
+	pac+=1
+	print("Ingrese el nombre del paciente",pac," ")
+	x = input()
+	paciente1=lista.getpaciente(nombre=x)
+	a3=lista.getmatrix(nombre=x)
+	dll = DoublyLinkedList()
+	rows = len(a3)
+	cols = len(a3)
+	dll.insertData(a3, rows, cols)
+	dll.dibujargrafica(x,"Período Inicial")
+	nodotablero = listadetableros()
+	nodotablero.tablero=dll
+	paciente1.settableros(nodotablero)
+	nodotab2=paciente1.tableros
+	for i in range(int(paciente1.periodos)):
+		dll2=DoublyLinkedList()
+		dll2.insertData(nodotab2.tablero.siguientediag(), rows, cols)
+		tablero2=listadetableros()
+		tablero2.tablero=dll2
+		dll2.dibujargrafica(x,str(i+1))
+		nodotab2.siguiente=tablero2
+		nodotab2=None
+		nodotab2=tablero2
+		# dll2.display()
 	nodotab2=None
-	nodotab2=tablero2
-	# dll2.display()
-nodotab2=None
-nodotab2=paciente1.tableros
-nodotab3=paciente1.tableros
-for i in range(int(paciente1.periodos)):
-	for j in range(int(paciente1.periodos)):
-		if i==j:
-			pass
-		if (nodotab2.tablero.siguientediag())==(nodotab3.tablero.siguientediag()):
-			print("Se ha encontrado el patrón en: ", j+1 )
-			break
-		
-		nodotab3=nodotab3.siguiente
-	nodotab2=nodotab2.siguiente
+	nodotab2=paciente1.tableros
 	nodotab3=paciente1.tableros
-# detecta=False
-# for i in range(int(paciente1.periodos)):
-# 	if detecta:
-# 		break
-# 	for j in range(int(paciente1.periodos)):
-# 		if i==j:
-# 			continue
-# 		else:
-# 			if (nodotab2.tablero.siguientediag())==(nodotab3.tablero.siguientediag()):
-# 				detecta=True
-# 				print("Se ha encontrado el patrón en: ", i )
-# 				break
+	encontrado=False
+	global estadopaciente
+	estadopaciente=""
+	repeticion=0
+	for i in range(int(paciente1.periodos)):
+		if encontrado:break
+		for j in range(int(paciente1.periodos)):
+			if ((nodotab2.tablero.siguientediag())==(nodotab3.tablero.siguientediag())) and (i!=j):
+				print("Se ha encontrado el patrón en: ", j )
+				repeticion=0
+				repeticion=abs(i-j)
+				print("El patrón se repite cada: ", repeticion)
+				curado=[True for z in nodotab2.tablero.siguientediag() if 1 in z]
+				if not curado:
+					print("El paciente se ha curado")
+					estadopaciente="curado"
+					repeticion=0
+				elif repeticion==1:
+					print("El paciente tiene una enfermedad mortal Q.E.P.D")
+					estadopaciente="muerto"
+					
+				else:
+					print("El paciente tiene una enfermedad grave")
+					estadopaciente="grave"
+					repeticion=0
+				encontrado=True
+				break
+			
+			nodotab3=nodotab3.siguiente
+		nodotab2=nodotab2.siguiente
+		nodotab3=paciente1.tableros
+		print("estado",estadopaciente)
+	if estadopaciente=="curado":
+		print("El paciente se curó")
+		estadopaciente="curado"
+	if estadopaciente=="muerto":
+		print("El paciente se murió")
+		estadopaciente="muerto"	
+	elif estadopaciente!="curado" and estadopaciente!="muerto":
+		print("El paciente tiene una enfermedad grave")
+		estadopaciente="grave"
+
+	pacientes.append([x,edad[0].firstChild.data,periodo[0].firstChild.data,m[0].firstChild.data,estadopaciente,repeticion])
+	if pac==nopa:
+		root = ET.Element("?xml version=1.0 encoding=UTF-8?")
+		doc = ET.SubElement(root, "doc")
+		nodo1 = ET.SubElement(doc, "pacientes\n")
+		for i in range(nopa):
+			
+			
+			nodo2 = ET.SubElement(doc, "paciente\n")
+
+			nodo3 = ET.SubElement(doc, "datos personales\n")
+			nodo4 = ET.SubElement(doc, "nombre\n")
+			nodo4.text=pacientes[i][0]
+			nodo5 = ET.SubElement(doc, "edad\n")
+			nodo5.text=pacientes[i][1]
+			nodo6 = ET.SubElement(doc, "periodos\n")
+			nodo6.text=pacientes[i][2]
+			nodo7 = ET.SubElement(doc, "m\n")
+			nodo7.text=pacientes[i][3]
+			nodo8 = ET.SubElement(doc, "resultado\n")
+			nodo8.text=pacientes[i][4]
+			nodo9 = ET.SubElement(doc, "n\n")
+			nodo9.text=str(pacientes[i][5])
+		arbol = ET.ElementTree(root)
+		tree = ET.ElementTree(root)
+		with open ("pacientes.xml", "wb") as files :
+			tree.write(files)
+
 
 		
-# 		nodotab3=nodotab3.siguiente
-# 	nodotab2=nodotab2.siguiente
-# 	nodotab3=paciente1.tableros
+	# detecta=False
+	# for i in range(int(paciente1.periodos)):
+	# 	if detecta:
+	# 		break
+	# 	for j in range(int(paciente1.periodos)):
+	# 		if i==j:
+	# 			continue
+	# 		else:
+	# 			if (nodotab2.tablero.siguientediag())==(nodotab3.tablero.siguientediag()):
+	# 				detecta=True
+	# 				print("Se ha encontrado el patrón en: ", i )
+	# 				break
 
-# print("Matriz con lista enlazada")
-dll.display()
-# print("TAMAÑO",dll.size)
+			
+	# 		nodotab3=nodotab3.siguiente
+	# 	nodotab2=nodotab2.siguiente
+	# 	nodotab3=paciente1.tableros
+
+	# print("Matriz con lista enlazada")
+	# print("TAMAÑO",dll.size)
