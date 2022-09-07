@@ -1,4 +1,4 @@
-from importlib.abc import TraversableResources
+
 import graphviz as gp
 class Paciente():
 	def __init__(self,nombre,edad,periodos,m,rejilla,matriz):

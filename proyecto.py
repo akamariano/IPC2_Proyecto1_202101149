@@ -38,6 +38,10 @@ if a=="SI":
 		m = i.getElementsByTagName('m')
 		rejilla = i.getElementsByTagName('rejilla')
 		celda = i.getElementsByTagName('celda')
+		# if int(m)>10000:
+		# 	print("Solo se admiten filas y columnas con un máximo de 10000")
+		# if int(periodo)>10000:
+		# 	print("Solo se evalúa  un máximo de 10000 períodos")
 		nu=int(m[0].firstChild.data)
 		a = np.zeros((nu, nu))
 		# print(a)
@@ -256,14 +260,14 @@ for i in range(int(nopa)):
 				else:
 					print("El paciente tiene una enfermedad grave")
 					estadopaciente="grave"
-					repeticion=0
+					# repeticion=0
 				encontrado=True
 				break
 			
 			nodotab3=nodotab3.siguiente
 		nodotab2=nodotab2.siguiente
 		nodotab3=paciente1.tableros
-		print("estado",estadopaciente)
+		
 	if estadopaciente=="curado":
 		print("El paciente se curó")
 		estadopaciente="curado"
